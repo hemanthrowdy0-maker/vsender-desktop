@@ -1,0 +1,38 @@
+{
+  "name": "vsender-live-chat",
+  "productName": "VSENDER Live Chat",
+  "version": "1.0.0",
+  "description": "VSENDER Live Chat for Windows",
+  "author": "VSENDER",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never",
+    "release": "electron-builder --win --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "in.vsender.livechat",
+    "productName": "VSENDER Live Chat",
+    "files": ["main.js", "app-config.js", "offline.html", "build/tray.png", "package.json"],
+    "icon": "build/icon.png",
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "artifactName": "VSENDER-Live-Chat-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "VSENDER Live Chat"
+    },
+    "publish": [{ "provider": "github", "releaseType": "release" }]
+  }
+}

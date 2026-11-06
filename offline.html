@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" />
+<title>VSENDER Live Chat</title>
+<style>
+  body{font-family:Segoe UI,Arial,sans-serif;background:#f6f7f9;color:#111;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+  .card{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:32px 40px;text-align:center;max-width:380px}
+  h1{font-size:18px;margin:0 0 8px} p{font-size:14px;color:#555;margin:0 0 18px}
+  button{background:#16a34a;color:#fff;border:0;border-radius:10px;padding:10px 20px;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Can’t connect to VSENDER</h1>
+    <p>Check your internet connection. This page tries again automatically.</p>
+    <button id="retry">Try again</button>
+  </div>
+<script>
+  var target = new URLSearchParams(location.search).get('u');
+  function go(){ if (target) location.href = target; }
+  document.getElementById('retry').onclick = go;
+  window.addEventListener('online', go);
+  setInterval(function(){ if (navigator.onLine) go(); }, 10000);
+</script>
+</body>
+</html>

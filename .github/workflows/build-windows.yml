@@ -1,0 +1,32 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch: {}        # Actions tab -> "Build Windows app" -> Run workflow (test build, kept as a download)
+  push:
+    tags: ['v*']               # a tag like v1.0.0 builds AND publishes a release (this feeds auto-update)
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - name: Test build (manual run)
+        if: github.ref_type != 'tag'
+        run: npm run dist
+      - name: Release build (tag)
+        if: github.ref_type == 'tag'
+        run: npm run release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VSENDER-Live-Chat-Windows
+          path: dist/*.exe
+          if-no-files-found: error
