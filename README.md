@@ -13,4 +13,5 @@ GitHub → **Actions** → **Build Windows app** → **Run workflow**. After ~5 
 ## Notes
 - The installer is unsigned: Windows shows "Windows protected your PC" → **More info → Run anyway**.
 - The website address is in `app-config.js`.
+- The app shows Live Chat only (plus sign-in pages). Other website pages open in your normal browser.
 - Closing the window keeps the app running in the tray; use the tray menu → Quit to exit.

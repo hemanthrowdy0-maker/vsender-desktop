@@ -32,6 +32,19 @@ function isOurs(url) {
   }
 }
 
+// The app is for Live Chat only. Sign-in related pages are allowed so people can log in/out;
+// every other page of the website (settings, campaigns…) is for the normal browser.
+const APP_PATHS = ['/app/live-chat', '/sign-up-login-screen', '/verify', '/reset-password', '/auth', '/account-blocked'];
+function isAppPage(url) {
+  try {
+    const u = new URL(url);
+    if (u.origin !== APP_ORIGIN) return false;
+    return APP_PATHS.some((p) => u.pathname === p || u.pathname.startsWith(p + '/'));
+  } catch {
+    return false;
+  }
+}
+
 function openExternal(url) {
   try {
     const u = new URL(url);
@@ -76,7 +89,7 @@ function createWindow() {
 
   // Our own site stays in the window; everything else opens in the browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    openExternal(url);
+    openExternal(url); // other site pages (and files) open in the normal browser
     return { action: 'deny' };
   });
   win.webContents.on('will-navigate', (event, url) => {
@@ -84,8 +97,22 @@ function createWindow() {
     if (!isOurs(url)) {
       event.preventDefault();
       openExternal(url);
+    } else if (!isAppPage(url)) {
+      event.preventDefault(); // another page of the website: stay in Live Chat
     }
   });
+  // Links inside the page change the address without a reload: bring the window back to Live Chat
+  const backToChat = (_e, url) => {
+    if (isOurs(url) && !isAppPage(url)) win.loadURL(START_URL);
+  };
+  win.webContents.on('did-navigate-in-page', backToChat);
+  win.webContents.on('did-navigate', backToChat);
+  // Safety net: some in-page route changes raise no event, so also check the address every second
+  const guard = setInterval(() => {
+    if (!win || win.isDestroyed()) return clearInterval(guard);
+    const url = win.webContents.getURL();
+    if (isOurs(url) && !isAppPage(url)) win.loadURL(START_URL);
+  }, 1000);
 
   // No connection / server down: friendly page with automatic retry
   win.webContents.on('did-fail-load', (_e, code, _desc, url, isMainFrame) => {
